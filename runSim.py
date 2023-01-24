@@ -39,7 +39,10 @@ def modifySimDat(simDat: dict, rate: float):
 
 
 def runSims(nSims):
-    runString = f"./sim {nSims}"
+    if platform == "linux" or platform == "linux2":
+        runString = f"./sim {nSims}"
+    else: ##windows
+        runString = f"sim.exe {nSims}"
     p = subprocess.Popen(runString,stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     out, err = p.communicate()
     results = out.decode('UTF-8').split(',')
@@ -85,30 +88,29 @@ def saveSimDescriptBin(simDescript,simNo,loc):
 
     saveArr.tofile(loc+f"simData{simNo}.bin",format='i4')
 
-def genFromBest(top,decimationFactor):
+def genFromBest(top,decimationFactor,mutationRates):
         newNets = []
+        mutRates = []
         for j in top:
-            for _ in range(decimationFactor):
+            for i in range(decimationFactor):
                 newNets.append(getSimDictFromBin("",j))
-        return newNets
-
-
-
+                mutRates.append(mutationRates[i])
+        return newNets,mutRates
 
 
 
 
 ##########################################################################
 ###Running Paramters
-nIterations = 10000
-nNodes = 100
-nEdges = 1000
-popSize = 10
-decimationFactor = 5
+nIterations = 100000
+nNodes = 50
+nEdges = 300
+popSize = 500
+decimationFactor = 20
 assert popSize%decimationFactor == 0 
 numberToSave = int(popSize/decimationFactor )
 nGenerations = 10
-mutationRates = np.linspace(0.1,0.01,nGenerations)
+mutationRates = np.linspace(0.1,0.001,decimationFactor)
 
 
 
@@ -179,10 +181,10 @@ for gen in range(nGenerations):
     bestInGen = np.fromfile(f"simData{top[0]}.bin",dtype='i4')
     bestInGen.tofile(f"best_gen_{gen}.bin",format='i4')
 
-    newNets = genFromBest(top,decimationFactor)
+    newNets,mutRats = genFromBest(top,decimationFactor,mutationRates)
     
-    for nN in newNets:
-        modifySimDat(nN,mutationRates[gen])
+    for nN,mr in zip(newNets,mutRats):
+        modifySimDat(nN,mr)
     
     for i,nN in enumerate(newNets):
         saveSimDescriptBin(nN,i,"")

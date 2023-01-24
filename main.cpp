@@ -149,7 +149,7 @@ inline float hillToClimb(float x) {
 inline int inputScaler(float ip) {
     float x = 0.05f * (ip - 50.0f);
     float fastsigmoid = 0.5 + 0.5 * x / (1.0f + abs(x));
-    return (int)10 * (1 - fastsigmoid);
+    return (int)5 * (1 - fastsigmoid);
 }
 
 template <typename T>

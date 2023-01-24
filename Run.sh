@@ -28,7 +28,7 @@ module load gcc openmpi/3.1.4
 conda activate --stack mpynn4
 
 # Change to model working directory
-model_dir="${HOME}/storage/newGeneticAlg"
+model_dir="${HOME}/storage/betterSelfContainedRun"
 
 cd ${model_dir}
 
